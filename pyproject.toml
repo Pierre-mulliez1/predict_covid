@@ -1,0 +1,18 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "cov"
+author = "Pierre Mulliez"
+author-email = "pierremulliez1@gmail.com"
+classifiers = [ "License :: OSI Approved :: MIT License",]
+description-file = "READme.md"
+#done in requirement.text
+#requires = [
+#  "pandas",
+#  "scikit-learn",
+#  "numpy",
+#  "pytest",
+#  "datetime"
+#]
