@@ -28,6 +28,10 @@ import matplotlib.pyplot as plt
 DIRECTORY_WHERE_THIS_FILE_IS = os.path.dirname(os.path.abspath("ml_stacking.md"))
 DATA_PATH = os.path.join(DIRECTORY_WHERE_THIS_FILE_IS, "data/prepared_dataset.csv")
 df1 = pd.read_csv(DATA_PATH)
+
+
+
+
 ```
 
 ```python
@@ -40,16 +44,78 @@ df1 = df1.drop("Unnamed: 0", axis = 1)
 
 ```python
 #some insights
-print("Number of provinces: {}".format(df1['provincia'].nunique()))
-print("Approximate number of days by region: {}".format(df1['fecha'].nunique()))
-print("Number of distinct age groups: {}".format(df1['grupo_edad'].nunique()))
-print('')
-print(517*51*10)
+print("number of provinces: {}".format(df1['provincia'].nunique()))
 print(df1.describe())
 ```
 
 ```python
+print(df1.head(2))
+print('')
+print(df2.head(2))
+print('')
+print(df3.head(2))
+print('')
+print(df4.head(2))
+print('')
+print(df5.head(2))
+```
+
+```python
+df8 = df4.merge(df5,on = "id", how = "left")
+df9 =  df2.merge(df3,on = "id", how = "left")
+```
+
+```python
+print(df8.head())
+print('')
+df9.head(2)
+```
+
+```python
+print(df8["jets"].unique())
+plt.hist(x=df8["jets"],color = "red")
+```
+
+```python
+#preprocessin: dumifying 
+
+```
+
+```python
 #df8 = pd.get_dummies(df8, columns=[''], prefix = '',drop_first=True)
+```
+
+```python
+#Null values 
+MR = df8['MR'].mean()
+e1 = df8['E1'].mean()
+```
+
+```python
+print(df8.isna().sum())
+#replace with mean
+df8['MR'] = df8['MR'].replace("",0.0).fillna(MR)
+df9['MR'] = df9['MR'].replace("",0.0).fillna(MR)
+
+df8['E1'] = df8['E1'].replace("",0.0).fillna(e1)
+df9['E1'] = df9['E1'].replace("",0.0).fillna(e1)
+```
+
+```python
+pd.set_option('display.max_columns', None)
+df8.head()
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
 ```
 
 ## Machine learning

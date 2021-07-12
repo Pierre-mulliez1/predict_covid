@@ -21,6 +21,7 @@ import numpy as np
 import os
 from matplotlib import pyplot as plt
 import datetime as dt
+#a
 ```
 
 ```python
@@ -245,7 +246,8 @@ final_data1 = final_data1.dropna()
 ```
 
 ```python
-final_data1
+#Check that all provinces are here 
+print("number of provinces: {}".format(final_data1['provincia'].nunique()))
 ```
 
 ```python
