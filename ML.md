@@ -48,29 +48,16 @@ print(517*51*10)
 print(df1.describe())
 ```
 
-```python
-#df8 = pd.get_dummies(df8, columns=[''], prefix = '',drop_first=True)
-```
-
 ## Machine learning
 
 
-### Split the dataset
+### Preprocessing
 
 ```python
 from sklearn.model_selection import train_test_split
-```
-
-```python
-y = df8["jets"]
-X = df8.loc[:,df8.columns != "jets"]
-```
-
-```python
-#scale 
-scaler = StandardScaler().fit(X)
-X = scaler.transform(X)
-X = pd.DataFrame(X)
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+df1.columns
 ```
 
 ```python
@@ -84,54 +71,66 @@ def get_correlation(data, threshold):
                 colname = corrmat.columns[i]
                 corr_col.add(colname)
     return corr_col
-
-corr_features = get_correlation(X, 0.70)
-print('correlated features: ', len(set(corr_features)) )
-corr_features
 ```
 
 ```python
-X = X.drop(labels=corr_features, axis = 1)
+def Prepare_dataset(df = df1,target = "num_casos_x",test = 0.2,dimension_reduction = False,scale = True):
+    
+    #drop the province name and date
+    df = df.drop(labels=['provincia','fecha','date'], axis = 1)
+    
+    #scale ( not the dummies or target)
+    col = ['provincia_iso','Communidad','grupo_edad','sexo','year','dayyear',target]
+
+  
+    if scale == True:
+        col_s = ['num_casos_x', 'num_casos_prueba_pcr',
+       'num_casos_prueba_test_ac', 'num_casos_prueba_ag',
+       'num_casos_prueba_elisa', 'num_casos_prueba_desconocida','num_casos_y', 'num_hosp', 'num_uci',
+       'num_def', 'people_fully_vaccinated_per_hundred', 'France_cases_mil',
+       'Portugal_cases_mil',  'poblacion']
+        S = pd.DataFrame(df.loc[:,col_s])
+        scaler = StandardScaler().fit(S)
+        S = pd.DataFrame(scaler.transform(pd.DataFrame(S)))
+        df = pd.concat([df, S], axis=1)
+    
+    
+    #dumify state and regions  
+    df = pd.get_dummies(df, columns=['provincia_iso','Communidad','grupo_edad','sexo'], prefix = ['province_','communidad_','age_','gender_'],drop_first=True)
+    
+    
+    #x y split
+    y = df[target]
+    X = df.loc[:,df.columns != target]
+    
+    
+    if dimension_reduction == False:
+        #delete highly correlated features
+        corr_features = get_correlation(X, 0.80)
+        X = X.drop(labels=corr_features, axis = 1)
+    else:
+        #PCA dimension reduction
+        pca = PCA(n_components= len(X.columns) ) #covariant Matrix
+        x_pca = pca.fit_transform(X)
+        variance = pca.explained_variance_ratio_ #calculate variance ratios
+        var=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=3)*100)
+        x_pca = pd.DataFrame(x_pca)
+        for el in range(0,len(x_pca)):
+            print(el)
+            if x_pca[el] < 65:
+                X = x_pca.drop(labels = el, axis = 1)
+    #train test
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=test, random_state=42)
+    
+    #prepare weak learner dataset
+    weak_leaner = pd.DataFrame()
+    weak_leaner['targetTRUE'] = df[target]
+    return X_train, X_test, y_train, y_test,weak_leaner
 ```
 
 ```python
-#train test
-X_train, X_test, y_train, y_test = train_test_split(
-   X, y, test_size=0.20, random_state=42)
-```
-
-```python
-X
-```
-
-#### Prepare submission table
-
-```python
-df9 = df9.sort_values(by='id')
-df9
-
-scaler = StandardScaler().fit(df9)
-df9 = scaler.transform(df9)
-df9 = pd.DataFrame(df9)
-#corr_features = get_correlation(X, 0.70)
-df9 = df9.drop(labels = corr_features, axis = 1)
-df9
-```
-
-## Create dataset for weak learners
-
-```python
-weak_leaner = pd.DataFrame()
-```
-
-```python
-#weak_leaner['targetTRUE'] = df10['jets']
-#weak_leaner['ra'] = X_test['ra']
-weak_leaner.shape
-```
-
-```python
-weak_leaner.head()
+Prepare_dataset(dimension_reduction = True)
 ```
 
 ## Random forest 
@@ -227,7 +226,7 @@ weak_leaner['targetridge'] = y_pred
 from sklearn import svm
 from sklearn.svm import SVC
 from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
+
 ```
 
 
@@ -288,12 +287,7 @@ weak_leaner['targetneigh'] = y_pred
 ## PCA LDA 
 
 ```python
-from sklearn.decomposition import PCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis 
-```
-
-```python
-X.columns.nunique()
 ```
 
 ```python

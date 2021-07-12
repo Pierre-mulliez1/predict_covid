@@ -75,17 +75,18 @@ complete_df.describe()
 
 ```python
 print("There are {} different provinces".format(len(complete_df['provincia_iso'].unique())))
-complete_df['provincia_iso'].unique()
+
 
 #Navarra code problem
 complete_df.loc[complete_df['provincia_iso'].isna() == True,:]
 ```
 
 ```python
-complete_df.loc[complete_df['provincia_iso'].isna() == True,:]['provincia_iso'].fillna("NA")
+complete_df.loc[:,'provincia_iso'] = complete_df.loc[:,'provincia_iso'].replace("","NA").fillna("NA")
 ```
 
 ```python
+print(complete_df['provincia_iso'].unique())
 complete_df.loc[complete_df['provincia_iso'].isna() == True,:]['provincia_iso']
 ```
 
@@ -248,7 +249,9 @@ df7
 ```python
 DATA_PATH = os.path.join(DIRECTORY_WHERE_THIS_FILE_IS, "data/iso_provinces.xlsx")
 df8 = pd.read_excel(DATA_PATH)
-df8.head()
+df8.loc[:,'provincia_iso'] = df8.loc[:,'provincia_iso'].replace("","NA").fillna("NA")
+print(df8.head())
+df8['provincia_iso'].unique()
 ```
 
 ```python
@@ -268,4 +271,12 @@ final_data1.to_csv('data/prepared_dataset.csv')
 
 ```python
 final_data1
+```
+
+```python
+final_data1.loc[final_data1['provincia_iso'] == "NA",:]
+```
+
+```python
+
 ```
