@@ -42,6 +42,19 @@ df1
 ```
 
 ```python
+#Convert to day of the year
+df1['dayyear'] = df1['fecha']
+print(df1.shape)
+for el in range(0, len(df1['fecha'])):
+    day_of_year =  pd.to_datetime(df1.iloc[el,8]).timetuple().tm_yday
+    df1.iloc[el,8] = day_of_year
+    if el == 15000:
+        print("processing halfway")
+#dummy collumn for year 
+df1['year'] = pd.DatetimeIndex(df1['fecha']).year
+```
+
+```python
 #Merging
 complete_df = pd.merge(df1, df2, how='left', on=['provincia_iso','fecha'])
 ```
@@ -100,15 +113,6 @@ print("data source do not agree with each other")
 complete_df.loc[complete_df["num_casos_y"] > 0,:]
 ```
 
-```python
-DATA_PATH = os.path.join(DIRECTORY_WHERE_THIS_FILE_IS, "data/population_total.csv")
-df4 = pd.read_csv(DATA_PATH, sep = "\\")
-```
-
-```python
-df4.head()
-```
-
 ### Overview of spain and neighboring countries demographic and covid over time 
 
 ```python
@@ -151,10 +155,6 @@ df5_portugal.columns = ['date','Portugal_cases_mil']
 ```
 
 ```python
-df5_spain.iloc[:,2]
-```
-
-```python
 #Get the correct date format
 df5_spain.iloc[:,2] = pd.to_datetime(df5_spain.iloc[:,2],format="%d/%m/%Y")
 df5_france.iloc[:,0] = pd.to_datetime(df5_france.iloc[:,0],format="%d/%m/%Y")
@@ -173,8 +173,9 @@ df5_spain.tail()
 #delete unused columns
 df_s = df5_spain.drop(["iso_code","location","new_cases_smoothed","new_deaths_smoothed","new_cases_smoothed_per_million","new_deaths_smoothed_per_million","weekly_icu_admissions","weekly_icu_admissions_per_million","weekly_hosp_admissions"
                                  ,"new_tests_smoothed","new_tests_smoothed_per_thousand","new_vaccinations_smoothed","new_vaccinations_smoothed_per_million","stringency_index"], axis = 1)
+df_s
 #we need state values
-df_s = df_s.iloc[:,0:31]
+df_s = df_s.iloc[:,0:29]
 ```
 
 ```python
@@ -250,4 +251,8 @@ final_data1
 ```python
 #####to csv final dataset
 final_data1.to_csv('data/prepared_dataset.csv')
+```
+
+```python
+final_data1
 ```
