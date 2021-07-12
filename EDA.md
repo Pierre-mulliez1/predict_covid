@@ -76,6 +76,17 @@ complete_df.describe()
 ```python
 print("There are {} different provinces".format(len(complete_df['provincia_iso'].unique())))
 complete_df['provincia_iso'].unique()
+
+#Navarra code problem
+complete_df.loc[complete_df['provincia_iso'].isna() == True,:]
+```
+
+```python
+complete_df.loc[complete_df['provincia_iso'].isna() == True,:]['provincia_iso'].fillna("NA")
+```
+
+```python
+complete_df.loc[complete_df['provincia_iso'].isna() == True,:]['provincia_iso']
 ```
 
 ```python
