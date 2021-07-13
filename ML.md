@@ -42,7 +42,7 @@ df1 = df1.drop("Unnamed: 0", axis = 1)
 #some insights
 print("Number of provinces: {}".format(df1['provincia'].nunique()))
 print("Approximate number of days by region: {}".format(df1['fecha'].nunique()))
-print("Number of distinct age groups: {}".format(df1['grupo_edad'].nunique()))
+#print("Number of distinct age groups: {}".format(df1['grupo_edad'].nunique()))
 print('')
 print(517*51*10)
 print(df1.describe())
@@ -74,21 +74,21 @@ def get_correlation(data, threshold):
 ```
 
 ```python
-def Prepare_dataset(df = df1,target = "num_casos_x",test = 0.2,dimension_reduction = False,scale = True):
+#divide by countries ! -> no dummies 
+def Prepare_dataset(df = df1,target = "num_casos",test = 0.2,dimension_reduction = False,scale = True, dummies = 'e'):
     
     #drop the province name and date
-    df = df.drop(labels=['provincia','fecha','date'], axis = 1)
+    df = df.drop(labels=['provincia','fecha','date','poblacion'], axis = 1)
     
     #scale ( not the dummies or target)
     col = ['provincia_iso','Communidad','grupo_edad','sexo','year','dayyear',target]
 
   
     if scale == True:
-        col_s = ['num_casos_x', 'num_casos_prueba_pcr',
+        col_s = ['num_casos', 'num_casos_prueba_pcr',
        'num_casos_prueba_test_ac', 'num_casos_prueba_ag',
-       'num_casos_prueba_elisa', 'num_casos_prueba_desconocida','num_casos_y', 'num_hosp', 'num_uci',
-       'num_def', 'people_fully_vaccinated_per_hundred', 'France_cases_mil',
-       'Portugal_cases_mil',  'poblacion']
+       'num_casos_prueba_elisa', 'num_casos_prueba_desconocida', 'people_fully_vaccinated_per_hundred', 'France_cases_mil',
+       'Portugal_cases_mil']
         S = pd.DataFrame(df.loc[:,col_s])
         scaler = StandardScaler().fit(S)
         S = pd.DataFrame(scaler.transform(pd.DataFrame(S)))
@@ -96,7 +96,8 @@ def Prepare_dataset(df = df1,target = "num_casos_x",test = 0.2,dimension_reducti
     
     
     #dumify state and regions  
-    df = pd.get_dummies(df, columns=['provincia_iso','Communidad','grupo_edad','sexo'], prefix = ['province_','communidad_','age_','gender_'],drop_first=True)
+    if dummies != 'e':
+        df = pd.get_dummies(df, columns=dummies, prefix = ['province_','communidad_'],drop_first=True)
     
     
     #x y split
@@ -113,11 +114,10 @@ def Prepare_dataset(df = df1,target = "num_casos_x",test = 0.2,dimension_reducti
         pca = PCA(n_components= len(X.columns) ) #covariant Matrix
         x_pca = pca.fit_transform(X)
         variance = pca.explained_variance_ratio_ #calculate variance ratios
-        var=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=3)*100)
+        var=np.cumsum(np.round(pca.explained_variance_ratio_, decimals=5)*100)
         x_pca = pd.DataFrame(x_pca)
-        for el in range(0,len(x_pca)):
-            print(el)
-            if x_pca[el] < 65:
+        for el in range(0,len(var)):
+            if var[el] < 65:
                 X = x_pca.drop(labels = el, axis = 1)
     #train test
     X_train, X_test, y_train, y_test = train_test_split(
@@ -130,7 +130,7 @@ def Prepare_dataset(df = df1,target = "num_casos_x",test = 0.2,dimension_reducti
 ```
 
 ```python
-Prepare_dataset(dimension_reduction = True)
+Prepare_dataset(dimension_reduction= True, dummies = ['provincia_iso','Communidad'])
 ```
 
 ## Random forest 
