@@ -127,9 +127,14 @@ complete_df.loc[complete_df["num_casos_y"] > 0,:]
 ```
 
 ```python
-#avoid duplicates with age and gender
-complete_df = df1
-complete_df.loc[:,'provincia_iso'] = complete_df.loc[:,'provincia_iso'].replace("","NA").fillna("NA")
+decision = False 
+```
+
+```python
+if decision == True:
+    #avoid duplicates with age and gender
+    complete_df = df1
+    complete_df.loc[:,'provincia_iso'] = complete_df.loc[:,'provincia_iso'].replace("","NA").fillna("NA")
 ```
 
 ### Overview of spain and neighboring countries demographic and covid over time 
